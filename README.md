@@ -14,8 +14,14 @@ In its current form, this script works as follows:
    - For each file:
      - _File Name:_ H6 file path label prefixing each file's contents
      - _File Contents:_ Contained in properly typed Markdown code-block
+- In most consoles, the `UpArrow` key can be used to quickly repeat this command, allowing one to keep the console window open, and update their Markdown codebase document in 2 keystrokes    
 
-> In most consoles, the `UpArrow` key can be used to quickly repeat this command, allowing one to keep the console window open, and update their Markdown codebase document in 2 keystrokes
+---
+### Example
+> A screenshot of my console with the command required to create a Markdown codebase of the documents involved with my personal website's background, and the tail end of that document being viewed in Obsidian.md—a _wonderful_ application which has helped me tremendously.
+![input_output_example](https://github.com/brennan-obc/markdown_helper/assets/113397554/36d4a076-36b8-46ac-8a5e-b5e90454c099)
 
-**GUI Implementation In The Works**
-    
+---
+#### Plans
+- Implement GUI with file explorer for vastly improved file selection
+  
