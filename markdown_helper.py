@@ -1,6 +1,37 @@
 import sys
 import os
+from watchdog.observers import Observer
+from watchdog.events import FileSystemEventHandler
 
+#* update on save
+# handler class
+class MarkdownUpdateHandler(FileSystemEventHandler):
+  def __init__(self, output_path, input_files):
+    self.output_path = output_path
+    self.input_files = input_files
+  
+  def on_modified(self, event):
+    if event.src_path in self.input_files:
+      generate_markdown(self.output_path, *self.input_files)
+      print(f"Changes detected in {event.src_path}; Markdown Codebase updated!")
+
+
+# file monitoring
+def start_monitoring(output_path, *input_paths):
+  event_handler = MarkdownUpdateHandler(output_path, input_paths)
+  observer = Observer()
+  paths_to_watch = set(os.path.dirname(path) for path in input_paths)
+  for path in paths_to_watch:
+    observer.schedule(event_handler, path, recursive=False)
+  observer.start()
+  try:
+    while True:
+      observer.join(1) # checks every second, indefinitely
+  except KeyboardInterrupt:
+    observer.stop()
+  observer.join()
+
+  #* convert given documents into document of labeled Markdown codeblocks
 # input
 def read_file_content(file_path):
   with open(file_path, 'r', encoding='utf-8') as file:
@@ -24,7 +55,8 @@ if __name__ == "__main__":
   if len(sys.argv) < 3:
     print("Usage: python markdown_generator.py <output_md_path> <input_file_path1> [input_file_path2] ...")
   else:
-    # 1. script, 2. output file path, 3+. input file path(s)
+    # args: 1. script, 2. output file path, 3+. input file path(s)
     output_md_path = sys.argv[1]
     input_files = sys.argv[2:]
-    generate_markdown(output_md_path, *input_files)
+    # begins monitoring of all input files, updates .md file on change
+    start_monitoring(output_md_path, *input_files)
