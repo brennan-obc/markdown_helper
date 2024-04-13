@@ -1,5 +1,6 @@
 import sys
 import os
+import time
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
 
@@ -9,11 +10,17 @@ class MarkdownUpdateHandler(FileSystemEventHandler):
   def __init__(self, output_path, input_files):
     self.output_path = output_path
     self.input_files = input_files
+    self.last_modified = {}
   
   def on_modified(self, event):
-    if event.src_path in self.input_files:
-      generate_markdown(self.output_path, *self.input_files)
-      print(f"Changes detected in {event.src_path}; Markdown Codebase updated!")
+    if event.src_path in self.input_files and event.event_type == 'modified':
+      current_time = time.time()
+      # ignore changes to directory & debounce to eliminate duplicate notifications
+      if not event.is_directory and (self.last_modified.get(event.src_path, 0) + 1 < current_time):
+        generate_markdown(self.output_path, *self.input_files)
+        pardir_file_name = os.path.join(os.path.basename(os.path.dirname(event.src_path)), os.path.basename(event.src_path))
+        print(f"Changes detected in {pardir_file_name}; Markdown Codebase updated!")
+        self.last_modified[event.src_path] = current_time
 
 
 # file monitoring
